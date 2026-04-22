@@ -525,6 +525,8 @@
     <!-- NetworkPreference -->
     <string name="pref_network_microg_login_title">Use microG to sign in to accounts</string>
     <string name="pref_network_microg_login_desc">Authenticate using microG when signing into Google accounts for a simpler sign-in flow</string>
+    <string name="pref_network_anonymous_only_title">Anonymous login only</string>
+    <string name="pref_network_anonymous_only_desc">Hide Google account sign-in (embedded WebView). Use only anonymous sessions via the token dispenser. Useful on devices where WebView sign-in does not work.</string>
     <string name="set">Set</string>
     <string name="disable">Disable</string>
     <string name="toast_proxy_disabled">Proxy disabled successfully</string>

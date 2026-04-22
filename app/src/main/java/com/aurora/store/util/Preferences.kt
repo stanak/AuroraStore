@@ -49,6 +49,9 @@ object Preferences {
 
     const val PREFERENCE_MICROG_AUTH = "PREFERENCE_MICROG_AUTH"
 
+    /** Hide Google login (including WebView path); use anonymous sessions only. */
+    const val PREFERENCE_ANONYMOUS_ONLY_AUTH = "PREFERENCE_ANONYMOUS_ONLY_AUTH"
+
     const val PREFERENCE_DISPENSER_URLS = "PREFERENCE_DISPENSER_URLS"
     const val PREFERENCE_VENDING_VERSION = "PREFERENCE_VENDING_VERSION"
 

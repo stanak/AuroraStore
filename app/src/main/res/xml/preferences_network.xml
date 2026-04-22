@@ -46,6 +46,13 @@
         app:summary="@string/pref_network_microg_login_desc"
         app:title="@string/pref_network_microg_login_title" />
 
+    <SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:iconSpaceReserved="false"
+        app:key="PREFERENCE_ANONYMOUS_ONLY_AUTH"
+        app:summary="@string/pref_network_anonymous_only_desc"
+        app:title="@string/pref_network_anonymous_only_title" />
+
     <com.aurora.store.view.custom.preference.AuroraListPreference
         app:defaultValue="0"
         app:entries="@array/pref_vending_version"

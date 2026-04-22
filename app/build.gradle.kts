@@ -66,6 +66,8 @@ configure<ApplicationExtension> {
         testInstrumentationRunnerArguments["disableAnalytics"] = "true"
 
         buildConfigField("String", "EXODUS_API_KEY", "\"bbe6ebae4ad45a9cbacb17d69739799b8df2c7ae\"")
+        // When true: splash hides Google login (no EmbeddedSetup WebView); only anonymous dispenser login.
+        buildConfigField("Boolean", "FORCE_ANONYMOUS_AUTH", "true")
 
         missingDimensionStrategy("device", "vanilla")
     }

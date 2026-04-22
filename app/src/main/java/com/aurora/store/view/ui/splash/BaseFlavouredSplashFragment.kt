@@ -20,6 +20,7 @@ import com.aurora.extensions.TAG
 import com.aurora.extensions.getPackageName
 import com.aurora.extensions.navigate
 import com.aurora.gplayapi.helpers.AuthHelper
+import com.aurora.store.BuildConfig
 import com.aurora.store.R
 import com.aurora.store.compose.navigation.Screen
 import com.aurora.store.data.model.AuthState
@@ -29,6 +30,7 @@ import com.aurora.store.util.CertUtil.GOOGLE_PLAY_AUTH_TOKEN_TYPE
 import com.aurora.store.util.CertUtil.GOOGLE_PLAY_CERT
 import com.aurora.store.util.PackageUtil
 import com.aurora.store.util.Preferences
+import com.aurora.store.util.Preferences.PREFERENCE_ANONYMOUS_ONLY_AUTH
 import com.aurora.store.util.Preferences.PREFERENCE_DEFAULT_SELECTED_TAB
 import com.aurora.store.util.Preferences.PREFERENCE_INTRO
 import com.aurora.store.util.Preferences.PREFERENCE_MICROG_AUTH
@@ -40,10 +42,26 @@ import kotlinx.coroutines.launch
 abstract class BaseFlavouredSplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     val viewModel: AuthViewModel by activityViewModels()
+    private var didAttemptAutoAnonymousLogin = false
 
     val canLoginWithMicroG: Boolean
         get() = PackageUtil.hasSupportedMicroGVariant(requireContext()) &&
             Preferences.getBoolean(requireContext(), PREFERENCE_MICROG_AUTH, true)
+
+    private fun anonymousOnlyAuth(): Boolean =
+        BuildConfig.FORCE_ANONYMOUS_AUTH ||
+            Preferences.getBoolean(requireContext(), PREFERENCE_ANONYMOUS_ONLY_AUTH, false)
+
+    private fun attemptAutoAnonymousLogin(): Boolean {
+        if (!anonymousOnlyAuth() || didAttemptAutoAnonymousLogin || viewModel.authState.value == AuthState.Fetching) {
+            return false
+        }
+
+        didAttemptAutoAnonymousLogin = true
+        binding.btnAnonymous.updateProgress(true)
+        viewModel.buildAnonymousAuthData()
+        return true
+    }
 
     val startForAccount =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -122,7 +140,11 @@ abstract class BaseFlavouredSplashFragment : BaseFragment<FragmentSplashBinding>
 
                     AuthState.Unavailable -> {
                         updateStatus(getString(R.string.session_login))
-                        updateActionLayout(true)
+                        if (!attemptAutoAnonymousLogin()) {
+                            updateActionLayout(true)
+                        } else {
+                            updateActionLayout(false)
+                        }
                     }
 
                     AuthState.SignedIn -> {
@@ -138,7 +160,11 @@ abstract class BaseFlavouredSplashFragment : BaseFragment<FragmentSplashBinding>
 
                     AuthState.SignedOut -> {
                         updateStatus(getString(R.string.session_scrapped))
-                        updateActionLayout(true)
+                        if (!attemptAutoAnonymousLogin()) {
+                            updateActionLayout(true)
+                        } else {
+                            updateActionLayout(false)
+                        }
                     }
 
                     AuthState.Verifying -> {
@@ -166,6 +192,9 @@ abstract class BaseFlavouredSplashFragment : BaseFragment<FragmentSplashBinding>
     private fun updateActionLayout(isVisible: Boolean) {
         binding.layoutAction.isVisible = isVisible
         binding.toolbar.isVisible = isVisible
+        if (isVisible) {
+            binding.btnGoogle.isVisible = !anonymousOnlyAuth()
+        }
     }
 
     private fun navigateToDefaultTab() {
