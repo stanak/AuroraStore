@@ -12,6 +12,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
     steps:
       - name: Checkout
@@ -28,16 +32,16 @@ jobs:
         run: chmod +x gradlew
 
       - name: Restore signing keystore
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > app/release-keystore.jks
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > app/release-keystore.jks
 
       - name: Create signing.properties
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
         run: |
           cat > app/signing.properties <<EOF
-          KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS=$ANDROID_KEY_ALIAS
+          KEY_PASSWORD=$ANDROID_KEY_PASSWORD
           STORE_FILE=release-keystore.jks
           EOF
 
